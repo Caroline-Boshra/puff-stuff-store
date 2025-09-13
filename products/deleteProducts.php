@@ -34,7 +34,9 @@ try {
 }
 
 
-
+if (!isset($decoded->data->type) || $decoded->data->type !== "admin") {
+    msg("Admins only", 403);
+}
 
 $product_id = intval($_POST['product_id'] ?? 0);
 if (!$product_id) msg("Product ID is required", 400);

@@ -31,7 +31,9 @@ try {
     exit;
 }
 
-
+if (!isset($decoded->data->type) || $decoded->data->type !== "admin") {
+    msg("Admins only", 403);
+}
 
 $product_id     = intval($_POST['product_id'] ?? 0);
 $name           = trim(htmlspecialchars($_POST['name'] ?? ''));

@@ -3,6 +3,11 @@
 require_once '../../inc/connection.php';
 require_once '../../inc/function.php';
 require_once '../../inc/header.php';
+require_once '../../config/config.php';
+require_once '../../vendor/autoload.php';
+
+use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
 
 
 
@@ -45,18 +50,21 @@ if (!password_verify($password, $admin['password'])) {
     msg("Wrong password", 401);
 }
 
-
 $payload = [
     "iss" => $iss,
     "aud" => $aud,
     "iat" => $iat,
     "exp" => $exp,
     "data" => [
-        "id" => $admin['id'],
-        "name" => $admin['name'],
-        "email" => $admin['email']
+        "id"    => $admin['id'],
+        "name"  => $admin['name'],
+        "email" => $admin['email'],
+        "type"  => "admin"
     ]
 ];
+
+
+
 
 $token = JWT::encode($payload, $key, 'HS256');
 

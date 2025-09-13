@@ -31,7 +31,9 @@ try {
 }
 
 
-
+if (!isset($decoded->data->type) || $decoded->data->type !== "admin") {
+    msg("Admins only", 403);
+}
 
 $name        = trim(htmlspecialchars($_POST['name'] ?? ''));
 $description = trim(htmlspecialchars($_POST['description'] ?? ''));

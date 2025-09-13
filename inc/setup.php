@@ -105,6 +105,15 @@ $createAddresses = "CREATE TABLE IF NOT EXISTS user_addresses (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 )";
 
+$createShippingFees = "CREATE TABLE IF NOT EXISTS shipping_fees (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    region VARCHAR(100) UNIQUE,
+    fee DECIMAL(10,2) DEFAULT 0,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+)";
+
+
 $createShippingTracking = "CREATE TABLE IF NOT EXISTS shipping_tracking (
     id INT AUTO_INCREMENT PRIMARY KEY,
     order_id INT,
@@ -132,6 +141,7 @@ $conn->query($createOrders);
 $conn->query($createOrderDetails);
 $conn->query($createCart);
 // $conn->query($createRatings);
+$conn->query($createShippingFees);
 $conn->query($createAddresses);
 $conn->query($createShippingTracking);
 $conn->query($createProductVariants);
