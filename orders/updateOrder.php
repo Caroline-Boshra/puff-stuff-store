@@ -133,19 +133,19 @@ $finalData = [
 ];
 
 
-$emailContent = "
-    <h2>Order Updated</h2>
-    <p><strong>Order ID:</strong> {$order_id}</p>
-    <p><strong>Customer:</strong> {$user['name']} ({$user['email']} - {$user['phone']})</p>
-    <p><strong>Shipping Address:</strong> {$new_shipping_address}, {$new_shipping_city}, {$new_shipping_region}</p>
-    <p><strong>Notes:</strong> {$new_shipping_notes}</p>
-    <p><strong>Shipping Fee:</strong> {$shipping_fee} EGP</p>
-    <h3>Products:</h3>
-    <ul>{$productList}</ul>
-    <p><strong>Status:</strong> {$order['status']}</p>
-";
-
-sendEmail("karolingeorge2011@gmail.com", "Order Updated #{$order_id}", $emailContent);
+// $emailContent = "
+//     <h2>Order Updated</h2>
+//     <p><strong>Order ID:</strong> {$order_id}</p>
+//     <p><strong>Customer:</strong> {$user['name']} ({$user['email']} - {$user['phone']})</p>
+//     <p><strong>Shipping Address:</strong> {$new_shipping_address}, {$new_shipping_city}, {$new_shipping_region}</p>
+//     <p><strong>Notes:</strong> {$new_shipping_notes}</p>
+//     <p><strong>Shipping Fee:</strong> {$shipping_fee} EGP</p>
+//     <h3>Products:</h3>
+//     <ul>{$productList}</ul>
+//     <p><strong>Status:</strong> {$order['status']}</p>
+// ";
+// sendEmail($user['email'], "Your Order #{$order_id}", $emailContent);
+// sendEmail("karolingeorge2011@gmail.com", "Order Updated #{$order_id}", $emailContent);
 
 
 msg("Order updated successfully", 200, $finalData);

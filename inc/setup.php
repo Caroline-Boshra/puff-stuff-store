@@ -131,6 +131,17 @@ $createProductVariants = "CREATE TABLE IF NOT EXISTS product_variants (
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
 )";
+$createWishlist = "CREATE TABLE IF NOT EXISTS wishlist (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT,
+    product_id INT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
+    UNIQUE(user_id, product_id) 
+)";
+
+
 
 $conn->query($createAdmins);
 $conn->query($createUsers);
@@ -145,6 +156,7 @@ $conn->query($createShippingFees);
 $conn->query($createAddresses);
 $conn->query($createShippingTracking);
 $conn->query($createProductVariants);
+$conn->query($createWishlist);
 
 echo "✅ All tables created successfully.";
 ?>
