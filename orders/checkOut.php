@@ -119,20 +119,20 @@ foreach ($products as $p) {
     $productList .= "<li>{$p['name']} - Qty: {$p['quantity']} - Price: {$p['subtotal']} EGP</li>";
 }
 
-$emailContent = "
-    <h2>Order Confirmation</h2>
-    <p><strong>Order ID:</strong> {$order_id}</p>
-    <p><strong>Customer:</strong> {$user['name']} ({$user['email']} - {$user['phone']})</p>
-    <p><strong>Shipping Address:</strong> {$shipping_address}, {$shipping_city}, {$shipping_region}</p>
-    <p><strong>Payment Method:</strong> {$payment_method}</p>
-    <p><strong>Total Price:</strong> {$total_price} EGP</p>
-    <h3>Products:</h3>
-    <ul>{$productList}</ul>
-    <p><strong>Notes:</strong> {$shipping_notes}</p>
-";
+// $emailContent = "
+//     <h2>Order Confirmation</h2>
+//     <p><strong>Order ID:</strong> {$order_id}</p>
+//     <p><strong>Customer:</strong> {$user['name']} ({$user['email']} - {$user['phone']})</p>
+//     <p><strong>Shipping Address:</strong> {$shipping_address}, {$shipping_city}, {$shipping_region}</p>
+//     <p><strong>Payment Method:</strong> {$payment_method}</p>
+//     <p><strong>Total Price:</strong> {$total_price} EGP</p>
+//     <h3>Products:</h3>
+//     <ul>{$productList}</ul>
+//     <p><strong>Notes:</strong> {$shipping_notes}</p>
+// ";
 
-sendEmail($user['email'], "Your Order #{$order_id}", $emailContent);
-sendEmail("karolingeorge2011@gmail.com", "New Order #{$order_id}", $emailContent);
+// sendEmail($user['email'], "Your Order #{$order_id}", $emailContent);
+// sendEmail("karolingeorge2011@gmail.com", "New Order #{$order_id}", $emailContent);
 
 $total_price_with_shipping = $total_price;
 
