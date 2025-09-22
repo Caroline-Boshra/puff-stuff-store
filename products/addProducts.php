@@ -132,14 +132,19 @@ if ($isLiquide) {
     $stmtVar->execute();
 }
 
+$protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? "https" : "http";
+$scriptName = $_SERVER['SCRIPT_NAME'] ?? '/';
+$projectRoot = dirname(dirname($scriptName)); 
+$baseUrl = rtrim($protocol . "://" . $_SERVER['HTTP_HOST'] . $projectRoot, '/') . '/uploads/';
+
 $response = [
     "product_id"     => $product_id,
     "name"           => $name,
     "description"    => $description,
     "category"       => $category,
     "brand"          => $brand,
-    "image"          => $imgName,
-    "category_image" => $finalCategoryImage,
+    "image"          => $baseUrl . $imgName,              
+    "category_image" => $baseUrl . $finalCategoryImage,  
     "price"          => $price,
     "stock"          => $stock,
 ];

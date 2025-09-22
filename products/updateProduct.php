@@ -13,7 +13,6 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     msg("Method Not Allowed", 405);
 }
 
-
 if (!isset($_SERVER['HTTP_AUTHORIZATION'])) {
     http_response_code(401);
     echo json_encode(["status" => 401, "message" => "Authorization token missing"]);
@@ -43,10 +42,14 @@ $stock          = trim(htmlspecialchars($_POST['stock'] ?? ''));
 $category_name  = trim(htmlspecialchars($_POST['category_name'] ?? ''));
 $brand_name     = trim(htmlspecialchars($_POST['brand_name'] ?? ''));
 
-
 if (!$product_id) msg("Product ID is required", 400);
 
-$stmt = $conn->prepare("SELECT * FROM products WHERE id = ?");
+// هات المنتج الحالي
+$stmt = $conn->prepare("SELECT p.*, c.name as category_name, c.image as category_image, b.name as brand_name 
+                        FROM products p 
+                        LEFT JOIN categories c ON p.category_id = c.id 
+                        LEFT JOIN brands b ON p.brand_id = b.id 
+                        WHERE p.id = ?");
 $stmt->bind_param("i", $product_id);
 $stmt->execute();
 $res = $stmt->get_result();
@@ -56,7 +59,7 @@ if ($res->num_rows === 0) {
 $currentProduct = $res->fetch_assoc();
 $image = $currentProduct['image'];
 
-
+// تحديث صورة المنتج
 if (isset($_FILES['product_image']) && $_FILES['product_image']['error'] === UPLOAD_ERR_OK) {
     $file = $_FILES['product_image'];
     $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
@@ -72,7 +75,7 @@ if (isset($_FILES['product_image']) && $_FILES['product_image']['error'] === UPL
     }
 }
 
-
+// تحديث أو إضافة البراند
 $brand_id = $currentProduct['brand_id'];
 if (!empty($brand_name)) {
     $stmt = $conn->prepare("SELECT id FROM brands WHERE name = ?");
@@ -89,9 +92,9 @@ if (!empty($brand_name)) {
     }
 }
 
-
+// تحديث أو إضافة الكاتيجوري
 $category_id = $currentProduct['category_id'];
-$category_image_name = null;
+$category_image_name = $currentProduct['category_image'];
 if (!empty($category_name)) {
     $stmt = $conn->prepare("SELECT * FROM categories WHERE name = ?");
     $stmt->bind_param("s", $category_name);
@@ -122,9 +125,7 @@ if (!empty($category_name)) {
                 $category_image_name = $newCatImg;
             }
         }
-
     } else {
-        
         if (!isset($_FILES['category_image']) || $_FILES['category_image']['error'] !== UPLOAD_ERR_OK) {
             msg("Category image is required for new category", 400);
         }
@@ -152,30 +153,27 @@ $description = $description ?: $currentProduct['description'];
 $price = $price ?: $currentProduct['price'];
 $stock = $stock ?: $currentProduct['stock'];
 
-
+ 
 $stmt = $conn->prepare("UPDATE products SET name = ?, description = ?, image = ?, price = ?, stock = ?, category_id = ?, brand_id = ? WHERE id = ?");
 $stmt->bind_param("sssiiiii", $name, $description, $image, $price, $stock, $category_id, $brand_id, $product_id);
 $stmt->execute();
 
 
-$stmtCheckCat = $conn->prepare("SELECT name FROM categories WHERE id = ?");
-$stmtCheckCat->bind_param("i", $category_id);
-$stmtCheckCat->execute();
-$resCatName = $stmtCheckCat->get_result();
-$catName = $resCatName->fetch_assoc()['name'];
-$isLiquide = strtolower($catName) === 'liquide';
+$isLiquide = strtolower($category_name ?: $currentProduct['category_name']) === 'liquide';
 
 
 $response = [
     "product_id"     => $product_id,
-    "updated_name"   => $name,
-    "updated_price"  => $price,
-    "updated_stock"  => $stock,
-    "updated_image"  => $image,
-    "category_name"  => $category_name,
-    "brand_name"     => $brand_name,
-    "category_image" => $category_image_name
+    "name"           => $name ?: $currentProduct['name'],
+    "description"    => $description ?: $currentProduct['description'],
+    "price"          => $price ?: $currentProduct['price'],
+    "stock"          => $stock ?: $currentProduct['stock'],
+    "image"          => $image ? $baseUrl . '/uploads/' . $image : ($currentProduct['image'] ? $baseUrl . '/uploads/' . $currentProduct['image'] : null),
+    "category_name"  => $category_name ?: $currentProduct['category_name'],
+    "category_image" => $category_image_name ? $baseUrl . '/uploads/' . $category_image_name : ($currentProduct['category_image'] ? $baseUrl . '/uploads/' . $currentProduct['category_image'] : null),
+    "brand_name"     => $brand_name ?: $currentProduct['brand_name'],
 ];
+
 
 if ($isLiquide) {
     $flavor   = trim(htmlspecialchars($_POST['flavor'] ?? ''));
@@ -204,6 +202,5 @@ if ($isLiquide) {
         "nicotine" => $nicotine
     ];
 }
-
 
 msg("Product and Category updated successfully", 200, $response);

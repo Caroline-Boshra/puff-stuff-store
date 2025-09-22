@@ -41,26 +41,28 @@ $update = $conn->prepare("UPDATE cart SET quantity = ? WHERE id = ? AND user_id 
 $update->bind_param("iii", $quantity, $cart_id, $user_id);
 $update->execute();
 
-if ($update->affected_rows > 0) {
-    $stmt = $conn->prepare("
-        SELECT 
-            c.id as cart_id,
-            c.quantity,
-            p.id as product_id,
-            p.name,
-            p.description,
-            p.price,
-            p.stock
-        FROM cart c
-        JOIN products p ON c.product_id = p.id
-        WHERE c.id = ? AND c.user_id = ?
-    ");
-    $stmt->bind_param("ii", $cart_id, $user_id);
-    $stmt->execute();
-    $res = $stmt->get_result();
-    $item = $res->fetch_assoc();
+// بعد الـ UPDATE نجيب البيانات سواء اتغيرت أو لأ
+$stmt = $conn->prepare("
+    SELECT 
+        c.id as cart_id,
+        c.quantity,
+        p.id as product_id,
+        p.name,
+        p.description,
+        p.price,
+        p.stock,
+        (p.price * c.quantity) AS total_price
+    FROM cart c
+    JOIN products p ON c.product_id = p.id
+    WHERE c.id = ? AND c.user_id = ?
+");
+$stmt->bind_param("ii", $cart_id, $user_id);
+$stmt->execute();
+$res = $stmt->get_result();
+$item = $res->fetch_assoc();
 
+if ($item) {
     msg("Cart updated successfully", 200, $item);
 } else {
-    msg("Nothing changed (maybe same quantity)", 200);
+    msg("Cart item not found", 404);
 }

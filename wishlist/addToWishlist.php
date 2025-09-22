@@ -46,7 +46,7 @@ if (!$product) {
 
 
 $baseUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http");
-$baseUrl .= "://" . $_SERVER['HTTP_HOST'] . "/traffic/uploads/";
+$baseUrl .= "://" . $_SERVER['HTTP_HOST'] . "/uploads/";
 $product['image'] = !empty($product['image']) ? $baseUrl . $product['image'] : null;
 
 

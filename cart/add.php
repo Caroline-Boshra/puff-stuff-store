@@ -12,7 +12,6 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     msg("Method Not Allowed", 405);
 }
 
-
 if (!isset($_SERVER['HTTP_AUTHORIZATION'])) {
     msg("Authorization token missing", 401);
 }
@@ -36,7 +35,6 @@ $quantity   = intval($_POST['quantity'] ?? 1);
 if ($product_id <= 0) msg("Product ID is required", 400);
 if ($quantity <= 0) msg("Quantity must be greater than 0", 400);
 
-
 $stmt = $conn->prepare("SELECT id, name, description, price, stock, image FROM products WHERE id = ?");
 $stmt->bind_param("i", $product_id);
 $stmt->execute();
@@ -49,7 +47,6 @@ $product = $res->fetch_assoc();
 if ($product['stock'] < $quantity) {
     msg("Not enough stock", 400);
 }
-
 
 $stmt = $conn->prepare("SELECT id, quantity FROM cart WHERE user_id = ? AND product_id = ?");
 $stmt->bind_param("ii", $user_id, $product_id);
@@ -70,6 +67,13 @@ if ($res->num_rows > 0) {
     $product['quantity'] = $quantity;
 }
 
+
+$protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? "https" : "http";
+$scriptName = $_SERVER['SCRIPT_NAME'] ?? '/';
+$projectRoot = dirname(dirname($scriptName)); 
+$baseUrl = rtrim($protocol . "://" . $_SERVER['HTTP_HOST'] . $projectRoot, '/') . '/uploads/';
+
+$product['image'] = $product['image'] ? $baseUrl . $product['image'] : null;
 
 msg("Product added to cart", 200, [
     "product" => $product

@@ -42,7 +42,7 @@ $res = $stmt->get_result();
 
 $wishlist = [];
 $baseUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http");
-$baseUrl .= "://" . $_SERVER['HTTP_HOST'] . "/traffic/uploads/";
+$baseUrl .= "://" . $_SERVER['HTTP_HOST'] . "/uploads/";
 
 while ($row = $res->fetch_assoc()) {
     $wishlist[] = [

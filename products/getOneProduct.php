@@ -8,17 +8,19 @@ if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
     msg("Method Not Allowed", 405);
 }
 
-
 $product_id = intval($_GET['id'] ?? 0);
 if (!$product_id) {
     msg("Product ID is required", 400);
 }
 
-
 $stmt = $conn->prepare("
-    SELECT p.id,p.name,p.description,p.image,p.price,p.stock,c.name AS category_name,c.image AS category_image,b.name AS brand_name
-    FROM products p LEFT JOIN categories c ON p.category_id = c.id
-    LEFT JOIN brands b ON p.brand_id = b.id WHERE p.id = ?
+    SELECT p.id,p.name,p.description,p.image,p.price,p.stock,
+           c.name AS category_name,c.image AS category_image,
+           b.name AS brand_name
+    FROM products p 
+    LEFT JOIN categories c ON p.category_id = c.id
+    LEFT JOIN brands b ON p.brand_id = b.id 
+    WHERE p.id = ?
 ");
 $stmt->bind_param("i", $product_id);
 $stmt->execute();
@@ -30,18 +32,23 @@ if ($res->num_rows === 0) {
 
 $row = $res->fetch_assoc();
 
+
+$protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? "https" : "http";
+$scriptName = $_SERVER['SCRIPT_NAME'] ?? '/';
+$projectRoot = dirname(dirname($scriptName)); 
+$baseUrl = rtrim($protocol . "://" . $_SERVER['HTTP_HOST'] . $projectRoot, '/') . '/uploads/';
+
 $product = [
     "product_id"     => $row['id'],
     "name"           => $row['name'],
     "description"    => $row['description'],
-    "image"          => $row['image'],
+    "image"          => $baseUrl . $row['image'],          
     "price"          => $row['price'],
     "stock"          => $row['stock'],
     "category_name"  => $row['category_name'],
-    "category_image" => $row['category_image'],
+    "category_image" => $baseUrl . $row['category_image'], 
     "brand_name"     => $row['brand_name'],
 ];
-
 
 if (strtolower($row['category_name']) === 'liquide') {
     $variantStmt = $conn->prepare("SELECT flavor, size, nicotine FROM product_variants WHERE product_id = ?");
